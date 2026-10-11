@@ -10,11 +10,20 @@ const APP_LIBRARY = {
   browser: { name: 'Navigateur', icon: '🌐', installed: true, type: 'app' },
   calculator: { name: 'Calculatrice', icon: '🧮', installed: true, type: 'app' },
   settings: { name: 'Paramètres', icon: '⚙️', installed: true, type: 'system' },
-  appstore: { name: 'Centre d’applications', icon: '🛍️', installed: true, type: 'app' },
+  appstore: { name: 'Centre d\'applications', icon: '🛍️', installed: true, type: 'app' },
   music: { name: 'Lecteur', icon: '🎵', installed: false, type: 'app' },
   office: { name: 'Bureau', icon: '📄', installed: false, type: 'app' },
   chat: { name: 'Messagerie', icon: '💬', installed: false, type: 'app' },
   games: { name: 'Jeux', icon: '🎮', installed: false, type: 'app' }
+};
+
+const MELIOL_MODULES = {
+  zram: { name: 'zRAM Engine', version: '2.0', status: 'disponible', description: 'Compaction RAM par degrés' },
+  hardware: { name: 'Hardware Killer', version: '3.0', status: 'disponible', description: 'Gestion d\'alimentation' },
+  translucency: { name: 'Apple Translucency', version: '7.5', status: 'disponible', description: 'Glassmorphism' },
+  core: { name: 'Core Engine', version: '12.8', status: 'disponible', description: 'Orchestration performance' },
+  uicore: { name: 'UI IA Core', version: '8.0', status: 'disponible', description: 'Barres Spotlight + IA' },
+  android: { name: 'Android Sandbox', version: '6.16', status: 'disponible', description: 'Sync Play Store' }
 };
 
 const systemState = {
@@ -23,16 +32,18 @@ const systemState = {
     name: 'Zorin OS Lite',
     version: 'Ultra Edition 2026',
     theme: 'light',
-    accent: '#2d7ff9'
+    accent: '#2d7ff9',
+    meliolVersion: 'v12.8'
   },
   apps: APP_LIBRARY,
+  meliolModules: {},
   files: {
-    'Documents/README.txt': 'Bienvenue dans Zorin OS Lite Simulator.\nCette machine a été modifiée.
-',
-    'Documents/notes.txt': 'Objectif : simuler un vrai environnement de bureau Zorin OS Lite.\nVous pouvez l’étendre avec des commandes et des applications.',
-    'Downloads/system-state.json': '{"status": "prêt"}'
+    'Documents/README.txt': 'Bienvenue dans Zorin OS Lite Simulator.\nCette machine a été modifiée.',
+    'Documents/notes.txt': 'Objectif : simuler un vrai environnement de bureau Zorin OS Lite.\nVous pouvez l\'étendre avec des commandes et des applications.',
+    'Downloads/system-state.json': '{\"status\": \"prêt\"}',
+    'Meliol/modules.conf': 'Modules Meliol Lite OS - Configuration système'
   },
-  notes: 'Votre système a été préconfiguré. Essayez les commandes: help, ls, install music, theme dark, export',
+  notes: 'Votre système a été préconfiguré. Essayez: help, install zram, modules, export',
   wallpaper: 'light',
   installedApps: ['terminal', 'files', 'notes', 'browser', 'calculator', 'settings', 'appstore'],
   windows: []
@@ -58,8 +69,9 @@ function loadState() {
       Object.assign(systemState, parsed);
       if (!systemState.apps) systemState.apps = APP_LIBRARY;
       if (!systemState.installedApps) systemState.installedApps = [...Object.keys(APP_LIBRARY).filter(k => APP_LIBRARY[k].installed)];
+      if (!systemState.meliolModules) systemState.meliolModules = {};
     } catch (err) {
-      console.warn('Impossible de charger l’état enregistré, le système reprend les valeurs par défaut.', err);
+      console.warn('Impossible de charger l\'état enregistré.', err);
     }
   }
 }
@@ -250,7 +262,7 @@ function openApp(appId) {
     if (appId === 'files' || appId === 'notes' || appId === 'terminal' || appId === 'browser' || appId === 'calculator' || appId === 'settings' || appId === 'appstore') {
       systemState.apps[appId] = { ...systemState.apps[appId], installed: true };
     } else {
-      alert(`L’application ${appId} n’est pas installée.`);
+      alert(`L'application ${appId} n'est pas installée.`);
       return;
     }
   }
@@ -314,8 +326,7 @@ function openTerminal() {
 
   const output = document.createElement('div');
   output.className = 'terminal-output';
-  output.textContent = `Bienvenue sur ${systemState.system.name}.
-Type "help" pour afficher les commandes.\n$ `;
+  output.textContent = `Bienvenue sur ${systemState.system.name}.\nType "help" pour afficher les commandes.\n$ `;
 
   const input = document.createElement('input');
   input.className = 'terminal-input';
@@ -326,7 +337,7 @@ Type "help" pour afficher les commandes.\n$ `;
       const command = input.value.trim();
       if (!command) return;
       output.textContent += `${command}\n`;
-      output.textContent += executeCommand(command) + '\n';
+      output.textContent += executeCommand(command) + '\n$ ';
       output.scrollTop = output.scrollHeight;
       input.value = '';
       saveState();
@@ -346,7 +357,7 @@ function executeCommand(command) {
 
   switch (cmd) {
     case 'help':
-      return `Commandes disponibles:\nhelp\nls\npwd\nwhoami\ncat <fichier>\necho <texte>\nmkdir <nom>\ninstall <app>\nuninstall <app>\napps\nexport\ntheme <light|dark|blue|green>\nclear\nreboot\napt list\ninfo`;
+      return `Commandes disponibles:\nhelp\nls\npwd\nwhoami\ncat <fichier>\necho <texte>\nmkdir <nom>\ninstall <app|module>\nuninstall <app|module>\napps\nmodules\nexport\ntheme <light|dark|blue|green>\nclear\nreboot\ninfo\napt list`;
     case 'ls':
       return Object.keys(systemState.files).join('\n') || 'Aucun fichier';
     case 'pwd':
@@ -362,25 +373,65 @@ function executeCommand(command) {
       const dirName = args[0];
       systemState.files[`${dirName}/placeholder.txt`] = 'Nouveau dossier créé.';
       return `Dossier créé: ${dirName}`;
+    
     case 'install':
-      if (!args[0]) return 'Utilisation: install <app>';
-      const appKey = args[0].toLowerCase();
-      if (!systemState.apps[appKey]) return `Application inconnue: ${appKey}`;
-      systemState.apps[appKey].installed = true;
-      if (!systemState.installedApps.includes(appKey)) systemState.installedApps.push(appKey);
-      return `Application installée: ${systemState.apps[appKey].name}`;
+      if (!args[0]) return 'Utilisation: install <app|module|all>';
+      const target = args[0].toLowerCase();
+      
+      // Installation de modules Meliol
+      if (MELIOL_MODULES[target]) {
+        systemState.meliolModules[target] = { ...MELIOL_MODULES[target], installed: true };
+        return `✅ Module ${MELIOL_MODULES[target].name} v${MELIOL_MODULES[target].version} installé avec succès !`;
+      }
+      
+      // Installation de tout
+      if (target === 'all') {
+        Object.keys(MELIOL_MODULES).forEach(key => {
+          systemState.meliolModules[key] = { ...MELIOL_MODULES[key], installed: true };
+        });
+        return `✅ Tous les modules Meliol ont été installés (zRAM, Hardware, Translucency, Core, UI IA, Android).`;
+      }
+      
+      // Installation d'applications classiques
+      if (!systemState.apps[target]) return `❌ Application/Module inconnu: ${target}`;
+      systemState.apps[target].installed = true;
+      if (!systemState.installedApps.includes(target)) systemState.installedApps.push(target);
+      return `✅ Application installée: ${systemState.apps[target].name}`;
+    
     case 'uninstall':
-      if (!args[0]) return 'Utilisation: uninstall <app>';
-      const key = args[0].toLowerCase();
-      if (!systemState.apps[key]) return `Application inconnue: ${key}`;
-      systemState.apps[key].installed = false;
-      systemState.installedApps = systemState.installedApps.filter((item) => item !== key);
-      return `Application désinstallée: ${systemState.apps[key].name}`;
+      if (!args[0]) return 'Utilisation: uninstall <app|module|all>';
+      const toRemove = args[0].toLowerCase();
+      
+      if (toRemove === 'all') {
+        systemState.meliolModules = {};
+        return '✅ Tous les modules Meliol ont été désinstallés.';
+      }
+      
+      if (MELIOL_MODULES[toRemove]) {
+        delete systemState.meliolModules[toRemove];
+        return `✅ Module ${MELIOL_MODULES[toRemove].name} désinstallé.`;
+      }
+      
+      if (!systemState.apps[toRemove]) return `❌ Application/Module inconnu: ${toRemove}`;
+      systemState.apps[toRemove].installed = false;
+      systemState.installedApps = systemState.installedApps.filter((item) => item !== toRemove);
+      return `✅ Application désinstallée: ${systemState.apps[toRemove].name}`;
+    
+    case 'modules':
+      if (Object.keys(systemState.meliolModules).length === 0) {
+        return 'Aucun module Meliol installé.\nCommande: install zram | install all';
+      }
+      return 'Modules Meliol installés:\n' + Object.keys(systemState.meliolModules)
+        .map(k => `✅ ${MELIOL_MODULES[k].name} (v${MELIOL_MODULES[k].version}) - ${MELIOL_MODULES[k].description}`)
+        .join('\n');
+    
     case 'apps':
-      return Object.keys(systemState.apps).map((k) => `${k}: ${systemState.apps[k].installed ? 'installée' : 'absente'}`).join('\n');
+      return Object.keys(systemState.apps).map((k) => `${k}: ${systemState.apps[k].installed ? '✅' : '⭕'}`).join('\n');
+    
     case 'apt':
-      if (args[0] === 'list') return 'Available packages:\n- music\n- office\n- chat\n- games';
+      if (args[0] === 'list') return 'Modules Meliol disponibles:\n- zram\n- hardware\n- translucency\n- core\n- uicore\n- android';
       return 'Commande apt non prise en charge directement';
+    
     case 'theme':
       const mode = (args[0] || '').toLowerCase();
       if (mode === 'dark') {
@@ -397,12 +448,15 @@ function executeCommand(command) {
         return 'Utilisation: theme <light|dark|blue|green>';
       }
       syncTheme();
-      return `Thème appliqué: ${mode}`;
+      return `✅ Thème appliqué: ${mode}`;
+    
     case 'clear':
       return 'clear';
+    
     case 'export':
       exportSystemState();
-      return 'Le système a été exporté dans le navigateur. Vérifiez le téléchargement.';
+      return '✅ Le système a été exporté. Vérifiez le téléchargement.';
+    
     case 'reboot':
       document.getElementById('desktop').classList.add('hidden');
       document.getElementById('bootScreen').classList.remove('hidden');
@@ -410,11 +464,14 @@ function executeCommand(command) {
         document.getElementById('bootScreen').classList.add('hidden');
         document.getElementById('desktop').classList.remove('hidden');
       }, 1200);
-      return 'Redémarrage du système...';
+      return '🔄 Redémarrage du système...';
+    
     case 'info':
-      return `${systemState.system.name} ${systemState.system.version}\nUtilisateur: ${currentUser}\nAccent: ${systemState.system.accent}`;
+      const moduleCount = Object.keys(systemState.meliolModules).length;
+      return `${systemState.system.name} ${systemState.system.version}\nUtilisateur: ${currentUser}\nAccent: ${systemState.system.accent}\nModules Meliol: ${moduleCount}/6`;
+    
     default:
-      return `Commande inconnue: ${cmd}. Tapez "help".`;
+      return `❌ Commande inconnue: ${cmd}. Tapez "help".`;
   }
 }
 
@@ -431,7 +488,7 @@ function openBrowser() {
   content.innerHTML = `
     <h3>Bienvenue sur le navigateur Zorin</h3>
     <p>Cette page simule un navigateur web de bureau.</p>
-    <p>Vous pouvez modifier le système à partir du terminal, installer des applications, puis télécharger la configuration complète.</p>
+    <p>Vous pouvez modifier le système à partir du terminal, installer des applications et modules Meliol, puis télécharger la configuration complète.</p>
     <p>Le système est prêt pour personnalisation.</p>
   `;
 
@@ -540,34 +597,32 @@ function openSettings() {
 }
 
 function openAppStore() {
-  const body = createWindow('appstore', 'Centre d’applications', 620, 420);
+  const body = createWindow('appstore', 'Centre d\'applications', 620, 420);
   const panel = document.createElement('div');
   panel.className = 'store-grid';
 
   Object.keys(systemState.apps).forEach((key) => {
     const app = systemState.apps[key];
-    if (!['terminal', 'files', 'notes', 'browser', 'calculator', 'settings', 'appstore'].includes(key) || true) {
-      const card = document.createElement('div');
-      card.className = 'store-card';
-      card.innerHTML = `
-        <strong>${app.icon} ${app.name}</strong><br>
-        <span>${app.installed ? 'Installée' : 'Disponible'}</span><br>
-        <button>${app.installed ? 'Désinstaller' : 'Installer'}</button>
-      `;
-      card.querySelector('button').addEventListener('click', () => {
-        if (app.installed) {
-          systemState.apps[key].installed = false;
-          systemState.installedApps = systemState.installedApps.filter((item) => item !== key);
-        } else {
-          systemState.apps[key].installed = true;
-          if (!systemState.installedApps.includes(key)) systemState.installedApps.push(key);
-        }
-        saveState();
-        renderStartMenu();
-        openAppStore();
-      });
-      panel.appendChild(card);
-    }
+    const card = document.createElement('div');
+    card.className = 'store-card';
+    card.innerHTML = `
+      <strong>${app.icon} ${app.name}</strong><br>
+      <span>${app.installed ? '✅ Installée' : '⭕ Disponible'}</span><br>
+      <button>${app.installed ? 'Désinstaller' : 'Installer'}</button>
+    `;
+    card.querySelector('button').addEventListener('click', () => {
+      if (app.installed) {
+        systemState.apps[key].installed = false;
+        systemState.installedApps = systemState.installedApps.filter((item) => item !== key);
+      } else {
+        systemState.apps[key].installed = true;
+        if (!systemState.installedApps.includes(key)) systemState.installedApps.push(key);
+      }
+      saveState();
+      renderStartMenu();
+      openAppStore();
+    });
+    panel.appendChild(card);
   });
 
   body.appendChild(panel);
@@ -576,25 +631,25 @@ function openAppStore() {
 
 function openMusic() {
   const body = createWindow('music', 'Lecteur', 420, 220);
-  body.innerHTML = '<div class="panel-box"><p>Lecture audio simulée</p><p>Exemple de musique Zorin.</p><button>Lecture</button></div>';
+  body.innerHTML = '<div class="panel-box"><p>🎵 Lecteur audio simulé</p><p>Exemple de musique Zorin.</p><button>Lecture</button></div>';
   updateTaskbar();
 }
 
 function openOffice() {
   const body = createWindow('office', 'Bureau', 460, 260);
-  body.innerHTML = '<div class="panel-box"><p>Suite bureautique simulée.</p><p>Votre système contient désormais un environnement de productivité.</p></div>';
+  body.innerHTML = '<div class="panel-box"><p>📄 Suite bureautique simulée</p><p>Votre système contient un environnement de productivité.</p></div>';
   updateTaskbar();
 }
 
 function openChat() {
   const body = createWindow('chat', 'Messagerie', 460, 300);
-  body.innerHTML = '<div class="panel-box"><p>Messages internes du système</p><p>Prêt pour les conversations entre utilisateurs.</p></div>';
+  body.innerHTML = '<div class="panel-box"><p>💬 Messages internes du système</p><p>Prêt pour les conversations.</p></div>';
   updateTaskbar();
 }
 
 function openGames() {
   const body = createWindow('games', 'Jeux', 380, 220);
-  body.innerHTML = '<div class="panel-box"><p>Mini-jeux simulés</p><p>Exemple : jeu de logique, puzzle, etc.</p></div>';
+  body.innerHTML = '<div class="panel-box"><p>🎮 Mini-jeux simulés</p><p>Jeu de logique, puzzle, etc.</p></div>';
   updateTaskbar();
 }
 
@@ -602,10 +657,12 @@ function exportSystemState() {
   const exportData = {
     system: systemState.system,
     installedApps: systemState.installedApps,
+    meliolModules: Object.keys(systemState.meliolModules),
     files: systemState.files,
     notes: systemState.notes,
     wallpaper: systemState.wallpaper,
-    user: currentUser
+    user: currentUser,
+    exportDate: new Date().toISOString()
   };
 
   const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
@@ -616,17 +673,23 @@ function exportSystemState() {
   a.click();
   URL.revokeObjectURL(url);
 
-  const zip = new JSZip();
-  zip.file('system.json', JSON.stringify(exportData, null, 2));
-  zip.file('README.txt', 'Système modifié - Zorin OS Lite Simulator\n');
-  zip.generateAsync({ type: 'blob' }).then((content) => {
-    const zipUrl = URL.createObjectURL(content);
-    const zipLink = document.createElement('a');
-    zipLink.href = zipUrl;
-    zipLink.download = 'zorin-lite-modified-package.zip';
-    zipLink.click();
-    URL.revokeObjectURL(zipUrl);
-  });
+  // Créer un fichier ZIP simple sans dépendance externe
+  downloadAsZip(exportData);
+}
+
+function downloadAsZip(data) {
+  // Simple ZIP généré manuellement
+  const json = JSON.stringify(data, null, 2);
+  const readme = `Système Zorin OS Lite Modifié\n================================\n\nCe fichier contient la sauvegarde complète de votre système simulé.\n\nFichiers inclus:\n- system.json: Configuration complète\n- modules.txt: Liste des modules Meliol installés\n- config.txt: Paramètres du système\n\nDate d'export: ${data.exportDate}\n`;
+  
+  const content = `system.json\n${json}\n\nREADME.txt\n${readme}`;
+  const blob = new Blob([content], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'zorin-lite-export.txt';
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 function attachEvents() {
@@ -637,7 +700,7 @@ function attachEvents() {
   document.getElementById('downloadSystemBtn').addEventListener('click', exportSystemState);
   document.getElementById('saveSystemBtn').addEventListener('click', () => {
     saveState();
-    alert('Système sauvegardé dans le navigateur.');
+    alert('✅ Système sauvegardé dans le navigateur.');
   });
   document.getElementById('shutdownBtn').addEventListener('click', () => {
     document.getElementById('desktop').classList.add('hidden');
