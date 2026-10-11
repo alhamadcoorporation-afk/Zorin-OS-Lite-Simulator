@@ -1,0 +1,558 @@
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  --bg-dark: #0e1b2a;
+  --bg-mid: #132639;
+  --panel: rgba(18, 30, 46, 0.82);
+  --panel-strong: rgba(10, 15, 22, 0.9);
+  --panel-light: rgba(255, 255, 255, 0.08);
+  --primary: #2d7ff9;
+  --primary-2: #4ca6ff;
+  --text: #edf6ff;
+  --muted: #b0c2d8;
+  --success: #6fe7b0;
+  --warning: #ffd166;
+  --danger: #ff5f7a;
+  --shadow: rgba(0, 0, 0, 0.35);
+}
+
+html, body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: var(--bg-dark);
+  color: var(--text);
+}
+
+button, input, textarea {
+  font: inherit;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.boot-screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #0a1420, #16314e 45%, #0a1420);
+  z-index: 200;
+}
+
+.boot-logo {
+  width: 110px;
+  height: 110px;
+  border-radius: 24px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-2));
+  color: white;
+  font-size: 4rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 18px 30px rgba(45, 127, 249, 0.35);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+.boot-title {
+  margin-top: 18px;
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+.boot-subtitle {
+  margin-top: 8px;
+  color: var(--muted);
+}
+
+.boot-progress {
+  width: 260px;
+  height: 12px;
+  margin-top: 20px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.1);
+  overflow: hidden;
+  position: relative;
+}
+
+.boot-progress span {
+  display: block;
+  width: 0;
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary-2), var(--success));
+  animation: load 2.1s linear forwards;
+}
+
+@keyframes load {
+  0% { width: 0; }
+  100% { width: 100%; }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+
+.login-screen {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(circle at center, rgba(77, 128, 255, 0.2), rgba(13, 23, 33, 0.9) 52%);
+  z-index: 150;
+}
+
+.login-panel {
+  width: min(440px, 90vw);
+  padding: 26px 24px 20px;
+  background: rgba(14, 27, 42, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 22px;
+  box-shadow: 0 30px 55px rgba(0,0,0,0.32);
+  backdrop-filter: blur(8px);
+}
+
+.login-brand {
+  text-align: center;
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-bottom: 18px;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.login-form label {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.login-form input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.04);
+  color: white;
+}
+
+.login-form button {
+  margin-top: 12px;
+  border: none;
+  padding: 13px 18px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-2));
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.desktop {
+  position: absolute;
+  inset: 0;
+}
+
+.wallpaper {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(135deg, rgba(105, 155, 255, 0.18), rgba(10, 15, 22, 0.18)),
+    radial-gradient(circle at 20% 20%, rgba(255,255,255,0.12), transparent 12%),
+    linear-gradient(135deg, #dfeaf9 0%, #aac0dd 25%, #7ca1cb 55%, #5c7fac 100%);
+}
+
+.desktop-icons {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  z-index: 3;
+}
+
+.desktop-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 92px;
+  padding: 10px 8px;
+  border-radius: 12px;
+  cursor: pointer;
+  user-select: none;
+  transition: 0.2s ease;
+}
+
+.desktop-icon:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+.desktop-icon .icon {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.18);
+  font-size: 1.8rem;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.15);
+}
+
+.desktop-icon span {
+  margin-top: 8px;
+  font-size: 0.78rem;
+  text-align: center;
+  color: #ffffff;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.36);
+}
+
+.windows-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+}
+
+.window {
+  position: absolute;
+  min-width: 300px;
+  min-height: 180px;
+  background: rgba(12, 22, 31, 0.85);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 25px 45px var(--shadow);
+  backdrop-filter: blur(10px);
+}
+
+.window-header {
+  height: 42px;
+  background: rgba(255,255,255,0.04);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  cursor: move;
+}
+
+.window-title {
+  font-weight: 600;
+  font-size: 0.96rem;
+}
+
+.window-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.window-controls button {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+}
+
+.window-controls .close { background: var(--danger); }
+.window-controls .min { background: var(--warning); }
+.window-controls .max { background: var(--success); }
+
+.window-body {
+  width: 100%;
+  height: calc(100% - 42px);
+  overflow: auto;
+  padding: 14px;
+}
+
+.top-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 54px;
+  display: grid;
+  grid-template-columns: 140px 1fr 220px;
+  align-items: center;
+  background: rgba(12, 18, 26, 0.8);
+  border-top: 1px solid rgba(255,255,255,0.08);
+  z-index: 100;
+}
+
+.top-bar-left, .top-bar-right {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.start-button, .download-btn {
+  height: 100%;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.start-button {
+  width: 100%;
+  background: linear-gradient(180deg, rgba(60, 112, 236, 0.76), rgba(40, 65, 123, 0.92));
+}
+
+.download-btn {
+  background: rgba(255,255,255,0.04);
+  padding: 0 16px;
+  border-left: 1px solid rgba(255,255,255,0.08);
+}
+
+.top-bar-center {
+  overflow: hidden;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.taskbar-apps {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  overflow: auto;
+  white-space: nowrap;
+  height: 100%;
+}
+
+.taskbar-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 9px;
+  background: rgba(255,255,255,0.05);
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+#clockText {
+  font-weight: 600;
+  padding: 0 12px;
+  color: var(--muted);
+}
+
+.start-menu {
+  position: absolute;
+  left: 0;
+  bottom: 54px;
+  width: 290px;
+  background: rgba(15, 25, 38, 0.96);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px 16px 0 0;
+  overflow: hidden;
+  z-index: 120;
+  box-shadow: 0 -16px 30px rgba(0,0,0,0.25);
+}
+
+.start-menu-header {
+  padding: 12px 14px;
+  font-weight: 700;
+  background: rgba(255,255,255,0.04);
+}
+
+.start-menu-items {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 12px;
+}
+
+.start-menu-items button,
+.start-menu-footer button {
+  background: rgba(255,255,255,0.04);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 10px;
+  padding: 10px 8px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.start-menu-footer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 0 12px 12px;
+}
+
+.app-window-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.panel-box {
+  background: rgba(255,255,255,0.04);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.app-list,
+.file-list,
+.settings-grid,
+.store-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+}
+
+.app-card, .file-card, .store-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.app-card button, .store-card button, .file-card button {
+  margin-top: 10px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-2));
+  color: white;
+  border: none;
+  padding: 8px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.terminal-output {
+  background: rgba(2, 6, 12, 0.88);
+  color: #d6f7ff;
+  border-radius: 10px;
+  border: 1px solid rgba(150, 180, 220, 0.2);
+  padding: 12px;
+  height: 260px;
+  overflow: auto;
+  white-space: pre-wrap;
+  font-family: "Consolas", monospace;
+  line-height: 1.5;
+}
+
+.terminal-input {
+  margin-top: 10px;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  background: rgba(255,255,255,0.04);
+  color: white;
+  width: 100%;
+  padding: 10px 12px;
+}
+
+.notepad-editor {
+  width: 100%;
+  min-height: 260px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.04);
+  color: white;
+  border-radius: 10px;
+  padding: 12px;
+  resize: none;
+}
+
+.browser-page {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.browser-bar {
+  display: flex;
+  gap: 8px;
+}
+
+.browser-bar input {
+  flex: 1;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.04);
+  color: white;
+  padding: 10px 12px;
+}
+
+.browser-content {
+  min-height: 220px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+  padding: 14px;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.setting-card {
+  background: rgba(255,255,255,0.04);
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.08);
+  padding: 12px;
+}
+
+.setting-card label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--muted);
+}
+
+.setting-card input[type="color"] {
+  width: 100%;
+  height: 42px;
+  border: none;
+  background: transparent;
+}
+
+.setting-card select,
+.setting-card input[type="text"] {
+  width: 100%;
+  background: rgba(0,0,0,0.16);
+  border: 1px solid rgba(255,255,255,0.08);
+  color: white;
+  padding: 8px 10px;
+  border-radius: 8px;
+}
+
+.toolbar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.toolbar button {
+  border: none;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.06);
+  color: white;
+  padding: 8px 10px;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .top-bar {
+    grid-template-columns: 110px 1fr 120px;
+  }
+  .download-btn {
+    font-size: 0.76rem;
+    padding: 0 8px;
+  }
+  .start-menu {
+    width: 250px;
+  }
+}

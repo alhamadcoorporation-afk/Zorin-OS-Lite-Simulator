@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Zorin OS Lite Simulator</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  </head>
+  <body>
+    <div id="bootScreen" class="boot-screen">
+      <div class="boot-logo">Z</div>
+      <div class="boot-title">Zorin OS Lite</div>
+      <div class="boot-subtitle">Démarrage du système ...</div>
+      <div class="boot-progress"><span></span></div>
+    </div>
+
+    <div id="loginScreen" class="login-screen hidden">
+      <div class="login-panel">
+        <div class="login-brand">Zorin OS Lite</div>
+        <div class="login-form">
+          <label>Nom d'utilisateur</label>
+          <input id="usernameInput" type="text" value="alhamad" />
+          <label>Mot de passe</label>
+          <input id="passwordInput" type="password" value="1234" />
+          <button id="loginButton">Connexion</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="desktop" class="desktop hidden">
+      <div id="wallpaper" class="wallpaper"></div>
+
+      <div id="desktopIcons" class="desktop-icons"></div>
+
+      <div id="windowsLayer" class="windows-layer"></div>
+
+      <div class="top-bar">
+        <div class="top-bar-left">
+          <button id="startButton" class="start-button">Démarrer</button>
+        </div>
+        <div class="top-bar-center">
+          <div id="taskbarApps" class="taskbar-apps"></div>
+        </div>
+        <div class="top-bar-right">
+          <span id="clockText">00:00</span>
+          <button id="downloadSystemBtn" class="download-btn">Télécharger</button>
+        </div>
+      </div>
+
+      <div id="startMenu" class="start-menu hidden">
+        <div class="start-menu-header">Applications</div>
+        <div id="startMenuItems" class="start-menu-items"></div>
+        <div class="start-menu-footer">
+          <button data-app="appstore">Centre d'applications</button>
+          <button data-app="settings">Paramètres</button>
+          <button id="saveSystemBtn">Sauvegarder</button>
+          <button id="shutdownBtn">Fermer</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
